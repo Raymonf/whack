@@ -1,6 +1,7 @@
 using System.Text;
 using Tommy;
 using UAssetAPI;
+using UAssetAPI.Kismet.Bytecode.Expressions;
 using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
 using WhackTranslationTool.Exceptions;
@@ -33,7 +34,20 @@ public class TableImporter
     private void ReadStrings(string tomlPath)
     {
         using var reader = File.OpenText(tomlPath);
-        var table = TOML.Parse(reader);
+        TomlTable table;
+        try
+        {
+            table = TOML.Parse(reader);
+        }
+        catch (TomlParseException ex)
+        {
+            Console.WriteLine($"*** ERROR: Failed to parse {tomlPath}: {ex.Message}");
+            foreach (var error in ex.SyntaxErrors)
+            {
+                Console.WriteLine($"* Syntax error at line {error.Line}: {error.Message}");
+            }
+            throw;
+        }
         foreach (var (key, value) in table.RawTable)
         {
             if (string.IsNullOrEmpty(key))
