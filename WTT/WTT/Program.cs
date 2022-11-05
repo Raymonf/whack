@@ -1,28 +1,30 @@
 ﻿using WhackTranslationTool;
 
 string? basePath = null; // @"WindowsNoEditor\Mercury\Content\Message";
+bool? overwrite = null;
 
 static string ResolveFileOverwrite(string path)
 {
     while (true)
     {
-        Console.WriteLine($"A file already exists at '{path}'");
-        Console.Write("Overwrite (y/n)? ");
+        var overwrite = YesNoPrompt.Ask(() =>
+        {
+            Console.WriteLine($"A file already exists at '{path}'");
+            Console.Write("Overwrite (Y/n)? ");
+        });
 
-        var input = Console.ReadLine()!.Trim().ToLowerInvariant();
-
-        if (input == "y")
+        if (overwrite)
         {
             return path;
         }
-
-        if (input == "n")
+        else
         {
-            Console.Write("Enter a new path: '");
-            return Console.ReadLine()!.Trim();
+            Console.Write("Enter a new path: ");
+            var newPath = Console.ReadLine()!.Trim();
+            if (newPath.Length < 1)
+                continue;
+            return newPath;
         }
-
-        Console.WriteLine($"Invalid selection!" + Environment.NewLine);
     }
 }
 
@@ -38,16 +40,32 @@ while (true)
     {
         if (basePath != null)
             Console.WriteLine("Invalid path to Message directory.");
-        Console.Write("Path to Message directory: ");
+        Console.Write("Path to the game's Message directory: ");
         basePath = Console.ReadLine()!.Trim();
         continue;
     }
-    Console.WriteLine("'e' for export, 'i' for import, 'bulk_import', 'bulk_export', 'q' to quit");
+    Console.WriteLine();
+    while (overwrite == null)
+    {
+        overwrite = YesNoPrompt.Ask(() =>
+        {
+            Console.WriteLine("! Overwrite mode will read from and overwrite files in your original Message folder.");
+            Console.Write("Enable overwrite mode (Y/n)? ");
+        });
+        Console.WriteLine();
+    }
+    Console.WriteLine("'e' for export, 'i' for import, 'bi' or 'bulk_import', 'be' or 'bulk_export', 'o' to toggle overwrite mode, 'q' to quit");
+    Console.WriteLine($"overwrite mode: {(overwrite.Value ? "ON" : "OFF")}");
     Console.WriteLine("reminder: don't screw up");
     Console.Write("Action: ");
     var action = Console.ReadLine()!.Trim().ToLowerInvariant();
     switch (action)
     {
+        case "o":
+            overwrite = !overwrite;
+            Console.WriteLine($"! Overwrite mode is now {(overwrite.Value ? "ON" : "OFF")}");
+            break;
+        case "be":
         case "bulk_export":
             {
                 var files = Directory.GetFiles(basePath, "*.uasset");
@@ -69,39 +87,59 @@ while (true)
 
                 break;
             }
+        case "bi":
         case "bulk_import":
-        {
-            Console.WriteLine(Environment.NewLine + "[Bulk Import Mode]");
-            Console.Write("Enter the path to the directory of TOML files: ");
-            var tomlFolder = Console.ReadLine()!;
-            Console.Write("Enter the path to the uasset directory: ");
-            var assetFolder = Console.ReadLine()!;
-            Console.Write("Enter the path to the output uasset directory: ");
-            var outputFolder = Console.ReadLine()!;
-            var files = Directory.GetFiles(tomlFolder, "*.toml");
-            foreach (var tableName in files)
             {
-                var assetFilename = GetAssetFilename(tableName);
-                var importer = new TableImporter(tableName, Path.Combine(assetFolder, assetFilename));
-                var outputPath = Path.Combine(outputFolder, assetFilename);
-                Console.WriteLine($"Exporting to {outputPath}");
-                importer.Write(outputPath);
+                Console.WriteLine(Environment.NewLine + "[Bulk Import Mode]");
+                Console.Write("Enter the path to the directory of TOML files: ");
+                var tomlFolder = Console.ReadLine()!;
+                string assetFolder, outputFolder;
+                if (!overwrite.Value)
+                {
+                    Console.Write("Enter the path to the uasset directory: ");
+                    assetFolder = Console.ReadLine()!;
+                    Console.Write("Enter the path to the output uasset directory: ");
+                    outputFolder = Console.ReadLine()!;
+                }
+                else
+                {
+                    Console.Write("! Override mode is on: using original Message directory.");
+                    assetFolder = basePath;
+                    outputFolder = basePath;
+                }
+                if (assetFolder.Length < 1 || outputFolder.Length < 1)
+                {
+                    Console.WriteLine($"! Didn't get a value for one of the directories, cancelling.");
+                    break;
+                }
+                var files = Directory.GetFiles(tomlFolder, "*.toml");
+                foreach (var tableName in files)
+                {
+                    var assetFilename = GetAssetFilename(tableName);
+                    var importer = new TableImporter(tableName, Path.Combine(assetFolder, assetFilename));
+                    var outputPath = Path.Combine(outputFolder, assetFilename);
+                    Console.WriteLine($"Exporting to {outputPath}");
+                    importer.Write(outputPath);
+                }
+                break;
             }
-            break;
-        }
         case "e":
             {
                 Console.WriteLine(Environment.NewLine + "[Export Mode]");
                 Console.Write("Enter the name of the asset (e.g., 'WelcomeMessage.uasset'): ");
                 var tableName = Console.ReadLine()!.Trim();
-                var exporter = new TableExporter(Path.Combine(basePath, tableName));
+                if (tableName.Length < 1)
+                {
+                    Console.WriteLine("! Didn't get a path to an asset, cancelling.");
+                    break;
+                }
 
+                var exporter = new TableExporter(Path.Combine(basePath, tableName));
                 var targetPath = Path.ChangeExtension(tableName, "toml");
                 if (File.Exists(targetPath))
                 {
                     targetPath = ResolveFileOverwrite(targetPath);
                 }
-
                 using StreamWriter writer = File.CreateText(targetPath);
                 exporter.WriteTo(writer);
                 writer.Flush();
