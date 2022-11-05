@@ -33,21 +33,40 @@ public class TableImporter
 
     private void ReadStrings(string tomlPath)
     {
-        using var reader = File.OpenText(tomlPath);
-        TomlTable table;
-        try
+        TomlTable? table = null;
+
+        var read = false;
+        while (!read)
         {
-            table = TOML.Parse(reader);
-        }
-        catch (TomlParseException ex)
-        {
-            Console.WriteLine($"*** ERROR: Failed to parse {tomlPath}: {ex.Message}");
-            foreach (var error in ex.SyntaxErrors)
+            try
             {
-                Console.WriteLine($"* Syntax error at line {error.Line}: {error.Message}");
+                using var reader = File.OpenText(tomlPath);
+                table = TOML.Parse(reader);
+                read = true;
             }
-            throw;
+            catch (TomlParseException ex)
+            {
+                Console.WriteLine($"*** ERROR: Failed to parse {tomlPath}: {ex.Message}");
+                foreach (var error in ex.SyntaxErrors)
+                {
+                    Console.WriteLine($"* Syntax error at line {error.Line}: {error.Message}");
+                }
+
+                // prompt to retry so I don't have to keep restarting this thing
+                Console.Write("Try again (Y/n)? ");
+                var response = Console.ReadLine()!.Trim().ToLowerInvariant();
+                if (response is not ("" or "y" or "yes"))
+                {
+                    break;
+                }
+            }
         }
+
+        if (table == null)
+        {
+            throw new UnhandledTomlError("TOML error was not handled");
+        }
+
         foreach (var (key, value) in table.RawTable)
         {
             if (string.IsNullOrEmpty(key))
