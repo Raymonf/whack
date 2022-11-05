@@ -55,7 +55,7 @@ public class TableImporter
                 // prompt to retry so I don't have to keep restarting this thing
                 var retry = YesNoPrompt.Ask(() =>
                 {
-                    Console.Write("Try again (Y/n)?");
+                    Console.Write("Try again (Y/n)? ");
                 });
 
                 if (!retry)
