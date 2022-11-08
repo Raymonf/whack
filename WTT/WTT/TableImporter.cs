@@ -74,8 +74,10 @@ public class TableImporter
                 throw new InvalidDataException($"key '{key}' is invalid");
             if (strings.ContainsKey(key))
                 throw new DuplicateKeyException($"duplicate key '{key}' found for file {tomlPath} ({asset.FilePath})");
-            var exists = value.HasKey("JapaneseMessage") && value["JapaneseMessage"].IsString;
-            strings.Add(key, exists ? value["JapaneseMessage"].AsString.Value : null);
+
+            // we now output the boolean false for null values since toml doesn't have null
+            var exists = value.HasKey("EnglishMessageUSA") && value["EnglishMessageUSA"].IsString;
+            strings.Add(key, exists ? value["EnglishMessageUSA"].AsString.Value : null);
         }
     }
 
@@ -94,13 +96,6 @@ public class TableImporter
                 continue;
             }
 
-            // index of JapaneseMessage
-            var jpnIndex = entry.StructType.Value.Value switch
-            {
-                "MessageData" => 0,
-                "CharaMessageData" => 3,
-                _ => throw new Exception($"Unhandled type '{entry.StructType}'")
-            };
             // index of EnglishMessageUSA
             var engIndex = entry.StructType.Value.Value switch
             {
@@ -109,8 +104,7 @@ public class TableImporter
                 _ => throw new Exception($"Unhandled type '{entry.StructType}'")
             };
 
-            // set the string as the english string if it isn't the same as the japanese string
-            if (strings[name] != null && ((FString)entry.Value[jpnIndex].RawValue).Value != strings[name])
+            if (strings[name] != null)
             {
                 entry.Value[engIndex].SetObject(FString.FromString(strings[name]));
             }
