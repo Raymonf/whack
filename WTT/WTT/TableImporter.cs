@@ -74,8 +74,8 @@ public class TableImporter
                 throw new InvalidDataException($"key '{key}' is invalid");
             if (strings.ContainsKey(key))
                 throw new DuplicateKeyException($"duplicate key '{key}' found for file {tomlPath} ({asset.FilePath})");
-            var exists = value.HasKey("EnglishMessageUSA") && value["EnglishMessageUSA"].IsString;
-            strings.Add(key, exists ? value["EnglishMessageUSA"].AsString.Value : null);
+            var exists = value.HasKey("JapaneseMessage") && value["JapaneseMessage"].IsString;
+            strings.Add(key, exists ? value["JapaneseMessage"].AsString.Value : null);
         }
     }
 
