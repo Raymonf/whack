@@ -3,12 +3,13 @@ using UAssetAPI;
 using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
 using WhackTranslationTool.Exceptions;
+using WTT;
 
 namespace WhackTranslationTool;
 
+
 public class TableExporter
 {
-    private readonly char[] _multilineChars = { '\n', '"' };
     private readonly ExportSettings _settings;
     private Dictionary<string, TomlTable> strings = new();
     
@@ -33,22 +34,10 @@ public class TableExporter
     private TomlTable MessageDataToTomlTable(StructPropertyData entry)
     {
         var tomlTable = new TomlTable();
-        
-        var japaneseValue = (entry.Value[0].RawValue as FString)?.Value;
-        if (japaneseValue != null)
-            tomlTable.Add("JapaneseMessage", new TomlString
-            {
-                IsMultiline = japaneseValue.IndexOfAny(_multilineChars) != -1,
-                Value = japaneseValue
-            });
-        
-        var koreanValue = (entry.Value[6].RawValue as FString)?.Value;
-        if (koreanValue != null)
-            tomlTable.Add("KoreanMessage", new TomlString
-            {
-                IsMultiline = koreanValue.IndexOfAny(_multilineChars) != -1,
-                Value = koreanValue
-            });
+
+        tomlTable.AddMessage(entry, 0, "JapaneseMessage");
+        tomlTable.AddMessage(entry, 1, "EnglishMessageUSA");
+        tomlTable.AddMessage(entry, 6, "KoreanMessage");
 
         return tomlTable;
     }
@@ -56,22 +45,11 @@ public class TableExporter
     private TomlTable CharacterMessageDataToTomlTable(StructPropertyData entry)
     {
         var tomlTable = new TomlTable();
-        
-        var japaneseValue = (entry.Value[3].RawValue as FString)?.Value;
-        if (japaneseValue != null)
-            tomlTable.Add("JapaneseMessage", new TomlString
-            {
-                IsMultiline = japaneseValue.IndexOfAny(_multilineChars) != -1,
-                Value = japaneseValue
-            });
-        
-        var koreanValue = (entry.Value[9].RawValue as FString)?.Value;
-        if (koreanValue != null)
-            tomlTable.Add("KoreanMessage", new TomlString
-            {
-                IsMultiline = koreanValue.IndexOfAny(_multilineChars) != -1,
-                Value = koreanValue
-            });
+
+        tomlTable.AddMessage(entry, 3, "JapaneseMessage");
+        tomlTable.AddMessage(entry, 4, "EnglishMessageUSA");
+        if (_settings.ExportKoreanMessage)
+            tomlTable.AddMessage(entry, 9, "KoreanMessage");
         
         return tomlTable;
     }

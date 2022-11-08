@@ -74,7 +74,8 @@ public class TableImporter
                 throw new InvalidDataException($"key '{key}' is invalid");
             if (strings.ContainsKey(key))
                 throw new DuplicateKeyException($"duplicate key '{key}' found for file {tomlPath} ({asset.FilePath})");
-            strings.Add(key, value.HasKey("JapaneseMessage") ? value["JapaneseMessage"].AsString.Value : null);
+            var exists = value.HasKey("EnglishMessageUSA") && value["EnglishMessageUSA"].IsString;
+            strings.Add(key, exists ? value["EnglishMessageUSA"].AsString.Value : null);
         }
     }
 
@@ -94,13 +95,25 @@ public class TableImporter
             }
 
             // index of JapaneseMessage
-            var index = entry.StructType.Value.Value switch
+            var jpnIndex = entry.StructType.Value.Value switch
             {
                 "MessageData" => 0,
                 "CharaMessageData" => 3,
                 _ => throw new Exception($"Unhandled type '{entry.StructType}'")
             };
-            entry.Value[index].SetObject(FString.FromString(strings[name]));
+            // index of EnglishMessageUSA
+            var engIndex = entry.StructType.Value.Value switch
+            {
+                "MessageData" => 1,
+                "CharaMessageData" => 4,
+                _ => throw new Exception($"Unhandled type '{entry.StructType}'")
+            };
+
+            // set the string as the english string if it isn't the same as the japanese string
+            if (strings[name] != null && ((FString)entry.Value[jpnIndex].RawValue).Value != strings[name])
+            {
+                entry.Value[engIndex].SetObject(FString.FromString(strings[name]));
+            }
         }
     }
 
