@@ -18,9 +18,15 @@
                         ]
                     },
                     {
-                        name: 'Force default engine locale (ignore router country language)',
+                        name: 'Force Engine locale (ignore router country language)',
                         patches: [
                             {offset : 0x558154, off: [0x74, 0x07], on : [0x90, 0x90]},
+                        ]
+                    },
+                    {
+                        name: 'Allow using CHN region (don\'t change to HKG)',
+                        patches: [
+                            {offset : 0x1F2B0B7, off: [0x75], on : [0xEB]},
                         ]
                     },
                 ]),
