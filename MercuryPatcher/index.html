@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8'>
+    <title>Mercury Patcher</title>
+    <link rel='stylesheet' href='css/style.css'>
+    <script type='text/javascript' src='js/dllpatcher.js'></script>
+    <script type="text/javascript">
+        window.addEventListener("load", function () {
+            new PatchContainer([
+                new Patcher('Mercury-Win64-Shipping.exe', "3.07.01", [
+                    {
+                        name: 'Fully disable lockout',
+                        patches: [
+                            {offset : 0x4EF970, off: [0xE8, 0x2B, 0x5A, 0xE4, 0xFF, 0x45, 0x33, 0xC0, 0x41, 0x8D, 0x50, 0x04, 0x48, 0x8B, 0xCB, 0xE8, 0x0C, 0xAC, 0xED, 0xFF, 0x84, 0xC0, 0x75, 0x12, 0xBA, 0x06], on : [0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0xBA, 0x00]},
+                            {offset : 0x4EF9A6, off: [0xBA, 0x02], on : [0xBA, 0x00]},
+                            {offset : 0x4EF9F2, off: [0x48, 0x8D, 0x55, 0x20, 0x48], on : [0xE9, 0x79, 0xFF, 0xFF, 0xFF]},
+                        ]
+                    },
+                    {
+                        name: 'Force default engine locale (ignore router country language)',
+                        patches: [
+                            {offset : 0x558154, off: [0x74, 0x07], on : [0x90, 0x90]},
+                        ]
+                    },
+                ]),
+            ]);
+        });
+    </script>
+</head>
+<body>
+<h1>Mercury Patcher</h1>
+</body>
+</html>
