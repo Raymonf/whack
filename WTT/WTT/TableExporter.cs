@@ -25,7 +25,7 @@ public class TableExporter
     {
         _settings = settings;
         
-        var asset = new UAsset(filename, TableConstants.UnrealVersion);
+        var asset = new UAsset(filename, Table.UnrealVersion);
         if (!asset.VerifyBinaryEquality())
             throw new UnsupportedAssetException($"'{asset.FilePath}' is not supported (no binary equality)");
         Read(asset);
@@ -36,8 +36,12 @@ public class TableExporter
         var tomlTable = new TomlTable();
 
         tomlTable.AddMessage(entry, 0, "JapaneseMessage");
-        tomlTable.AddMessage(entry, 1, "EnglishMessageUSA");
-        tomlTable.AddMessage(entry, 6, "KoreanMessage");
+        if (_settings.ExportEnglishUSAMessage)
+            tomlTable.AddMessage(entry, 1, "EnglishMessageUSA");
+        if (_settings.ExportSChineseMessage)
+            tomlTable.AddMessage(entry, 5, "SimplifiedChineseMessage");
+        if (_settings.ExportKoreanMessage)
+            tomlTable.AddMessage(entry, 6, "KoreanMessage");
 
         return tomlTable;
     }
@@ -47,7 +51,10 @@ public class TableExporter
         var tomlTable = new TomlTable();
 
         tomlTable.AddMessage(entry, 3, "JapaneseMessage");
-        tomlTable.AddMessage(entry, 4, "EnglishMessageUSA");
+        if (_settings.ExportEnglishUSAMessage)
+            tomlTable.AddMessage(entry, 4, "EnglishMessageUSA");
+        if (_settings.ExportSChineseMessage)
+            tomlTable.AddMessage(entry, 8, "SimplifiedChineseMessage");
         if (_settings.ExportKoreanMessage)
             tomlTable.AddMessage(entry, 9, "KoreanMessage");
         

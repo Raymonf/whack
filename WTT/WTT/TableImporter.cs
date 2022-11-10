@@ -5,6 +5,7 @@ using UAssetAPI.Kismet.Bytecode.Expressions;
 using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
 using WhackTranslationTool.Exceptions;
+using WTT;
 
 namespace WhackTranslationTool;
 
@@ -12,21 +13,24 @@ public class TableImporter
 {
     private Dictionary<string, string?> strings = new();
     private UAsset asset;
-    
+    private Language language;
+
     /// <summary>
     /// 
     /// </summary>
     /// <param name="tomlPath">Path to the toml source import file</param>
     /// <param name="assetPath">Path to the target uasset file</param>
     /// <exception cref="UnsupportedAssetException">When UAssetAPI fails to reconstruct the asset file</exception>
-    public TableImporter(string tomlPath, string assetPath)
+    public TableImporter(string tomlPath, string assetPath, Language language = Language.EnglishUSA)
     {
-        asset = new UAsset(assetPath, TableConstants.UnrealVersion);
+        this.language = language;
+
+        asset = new UAsset(assetPath, Table.UnrealVersion);
         if (!asset.VerifyBinaryEquality())
         {
             throw new UnsupportedAssetException($"'{asset.FilePath}' is not supported (no binary equality)");
         }
-        
+
         ReadStrings(tomlPath);
         UpdateAssetStrings();
     }
@@ -68,6 +72,7 @@ public class TableImporter
             throw new UnhandledTomlError("TOML error was not handled");
         }
 
+        var keyName = Table.GetMessageKeyName(language);
         foreach (var (key, value) in table.RawTable)
         {
             if (string.IsNullOrEmpty(key))
@@ -76,8 +81,8 @@ public class TableImporter
                 throw new DuplicateKeyException($"duplicate key '{key}' found for file {tomlPath} ({asset.FilePath})");
 
             // we now output the boolean false for null values since toml doesn't have null
-            var exists = value.HasKey("EnglishMessageUSA") && value["EnglishMessageUSA"].IsString;
-            strings.Add(key, exists ? value["EnglishMessageUSA"].AsString.Value : null);
+            var exists = value.HasKey(keyName) && value[keyName].IsString;
+            strings.Add(key, exists ? value[keyName].AsString.Value : null);
         }
     }
 
@@ -96,18 +101,10 @@ public class TableImporter
                 continue;
             }
 
-            // index of EnglishMessageUSA
-            var engIndex = entry.StructType.Value.Value switch
-            {
-                "MessageData" => 1,
-                "CharaMessageData" => 4,
-                _ => throw new Exception($"Unhandled type '{entry.StructType}'")
-            };
-
-            if (strings[name] != null)
-            {
-                entry.Value[engIndex].SetObject(FString.FromString(strings[name]));
-            }
+            // index of the Message key
+            var index = Table.GetMessageIndex(entry, language);
+            // if (strings[name] != null)
+            entry.Value[index].SetObject(FString.FromString(strings[name]));
         }
     }
 
