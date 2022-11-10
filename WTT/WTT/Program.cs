@@ -103,7 +103,7 @@ while (true)
                 }
                 else
                 {
-                    Console.Write("! Override mode is on: using original Message directory.");
+                    Console.WriteLine("! Override mode is on: using original Message directory.");
                     assetFolder = basePath;
                     outputFolder = basePath;
                 }

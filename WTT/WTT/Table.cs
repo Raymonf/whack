@@ -23,13 +23,6 @@ public class Table
         };
     }
 
-    /// <summary>
-    /// Returns the prop
-    /// </summary>
-    /// <param name="entry"></param>
-    /// <param name="language"></param>
-    /// <returns></returns>
-    /// <exception cref="Exception"></exception>
     public static int GetMessageIndex(StructPropertyData entry, Language language)
     {
         switch (language)
