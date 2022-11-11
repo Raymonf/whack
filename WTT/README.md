@@ -2,7 +2,7 @@
 
 Based on [UAssetAPI](https://github.com/atenfyr/UAssetAPI).
 
-It replaces existing EnglishMessageUSA strings, so you can't add new ones for whatever reason. Tested on version 3.7.10.
+It replaces existing EnglishMessageUSA strings, so you can't add new ones for whatever reason. Tested on version 3.07.01.
 
 **Beware:** There is very little error handling since this tool was originally meant for my personal use. **You should check the changelog out if you've used this in the past.**
 
@@ -30,7 +30,7 @@ If you want to toggle override mode, use the **o** command.
 
 ### Changelog
 
-* 11/8/2022
+### 11/8/2022
 
 WTT now focuses on editing the `EnglishMessageUSA` column in the strings. Feel free to ask me how you can make your game read that column instead of the `JapaneseMessage` column if you don't know how!
 
