@@ -48,7 +48,6 @@ int CreateHooks()
 {
     OutputDebugStringW(L"[galliumhook] CreateHooks()\r\n");
     auto base = (uint64_t)GetModuleHandleW(NULL);
-    WndProc = (tWndProc)(base + wndProcAddr);
 
     if (MH_Initialize() != MH_OK)
     {
@@ -56,17 +55,26 @@ int CreateHooks()
         return 0;
     }
 
-    auto createResult = MH_CreateHook(WndProc, &DetourWndProc, reinterpret_cast<LPVOID*>(&fpWndProc));
-    if (createResult != MH_OK)
+    if (wndProcAddr != 0)
     {
-        MessageBox(NULL, L"Couldn't create WndProc hook", L"galliumhook", MB_OK);
-        return 0;
-    }
+        OutputDebugStringW(L"[galliumhook] Creating WndProc hook\r\n");
+        WndProc = (tWndProc)(base + wndProcAddr);
 
-    if (MH_EnableHook(WndProc) != MH_OK)
+        if (MH_CreateHook(WndProc, &DetourWndProc, reinterpret_cast<LPVOID*>(&fpWndProc)) != MH_OK)
+        {
+            MessageBox(NULL, L"Couldn't create WndProc hook", L"galliumhook", MB_OK);
+            return 0;
+        }
+
+        if (MH_EnableHook(WndProc) != MH_OK)
+        {
+            MessageBox(NULL, L"Couldn't enable WndProc hook", L"galliumhook", MB_OK);
+            return 0;
+        }
+    }
+    else
     {
-        MessageBox(NULL, L"Couldn't enable WndProc hook", L"galliumhook", MB_OK);
-        return 0;
+        OutputDebugStringW(L"[galliumhook] Not creating WndProc hook\r\n");
     }
 
     if (MH_CreateHook(&CreateWindowExW, &DetourCreateWindowExW, reinterpret_cast<LPVOID*>(&fpCreateWindowExW)) != MH_OK)
