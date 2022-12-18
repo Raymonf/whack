@@ -44,6 +44,6 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: WTT Binaries - ${{ env.Configuration }}
-        path: ${{ env.WTT_Project_Directory }}\bin\$env:Configuration
+        path: ${{ env.WTT_Project_Directory }}\bin\${{ env.Configuration }}
       env:
         Configuration: ${{ matrix.configuration }}
