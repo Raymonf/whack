@@ -1,13 +1,9 @@
-using System.Text;
 using Tommy;
 using UAssetAPI;
-using UAssetAPI.Kismet.Bytecode.Expressions;
-using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
-using WhackTranslationTool.Exceptions;
-using WTT;
+using WTT.Exceptions;
 
-namespace WhackTranslationTool;
+namespace WTT;
 
 public class TableImporter
 {
@@ -21,7 +17,7 @@ public class TableImporter
     /// <param name="tomlPath">Path to the toml source import file</param>
     /// <param name="assetPath">Path to the target uasset file</param>
     /// <exception cref="UnsupportedAssetException">When UAssetAPI fails to reconstruct the asset file</exception>
-    public TableImporter(string tomlPath, string assetPath, Language language = Language.EnglishUSA)
+    public TableImporter(string tomlPath, string assetPath, Language language)
     {
         this.language = language;
 

@@ -1,12 +1,9 @@
 using Tommy;
 using UAssetAPI;
 using UAssetAPI.PropertyTypes.Structs;
-using UAssetAPI.UnrealTypes;
-using WhackTranslationTool.Exceptions;
-using WTT;
+using WTT.Exceptions;
 
-namespace WhackTranslationTool;
-
+namespace WTT;
 
 public class TableExporter
 {
@@ -38,6 +35,12 @@ public class TableExporter
         tomlTable.AddMessage(entry, 0, "JapaneseMessage");
         if (_settings.ExportEnglishUSAMessage)
             tomlTable.AddMessage(entry, 1, "EnglishMessageUSA");
+        if (_settings.ExportEnglishSGMessage)
+            tomlTable.AddMessage(entry, 2, "EnglishMessageSG");
+        if (_settings.ExportTChineseTWMessage)
+            tomlTable.AddMessage(entry, 3, "TraditionalChineseMessageTW");
+        if (_settings.ExportTChineseHKMessage)
+            tomlTable.AddMessage(entry, 4, "TraditionalChineseMessageHK");
         if (_settings.ExportSChineseMessage)
             tomlTable.AddMessage(entry, 5, "SimplifiedChineseMessage");
         if (_settings.ExportKoreanMessage)
@@ -53,6 +56,12 @@ public class TableExporter
         tomlTable.AddMessage(entry, 3, "JapaneseMessage");
         if (_settings.ExportEnglishUSAMessage)
             tomlTable.AddMessage(entry, 4, "EnglishMessageUSA");
+        if (_settings.ExportEnglishSGMessage)
+            tomlTable.AddMessage(entry, 5, "EnglishMessageSG");
+        if (_settings.ExportTChineseTWMessage)
+            tomlTable.AddMessage(entry, 6, "TraditionalChineseMessageTW");
+        if (_settings.ExportTChineseHKMessage)
+            tomlTable.AddMessage(entry, 7, "TraditionalChineseMessageHK");
         if (_settings.ExportSChineseMessage)
             tomlTable.AddMessage(entry, 8, "SimplifiedChineseMessage");
         if (_settings.ExportKoreanMessage)

@@ -1,8 +1,7 @@
 using UAssetAPI.PropertyTypes.Structs;
 using UAssetAPI.UnrealTypes;
-using WTT;
 
-namespace WhackTranslationTool;
+namespace WTT;
 
 public class Table
 {

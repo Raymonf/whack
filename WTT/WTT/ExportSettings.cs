@@ -1,4 +1,4 @@
-namespace WhackTranslationTool;
+namespace WTT;
 
 public class ExportSettings
 {

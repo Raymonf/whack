@@ -1,4 +1,5 @@
-﻿using WhackTranslationTool;
+﻿using System.Text.Json;
+using WTT;
 
 string? basePath = null; // @"WindowsNoEditor\Mercury\Content\Message";
 bool? overwrite = null;
@@ -33,9 +34,74 @@ static string GetAssetFilename(string path)
     return Path.GetFileNameWithoutExtension(path) + ".uasset";
 }
 
+const string ExportSettingsFilename = "ExportSettings.json";
+const string ImportSettingsFilename = "ImportSettings.json";
+
 while (true)
 {
     Console.WriteLine("[whack Translation Tool]");
+
+    // fuck it, hacked in settings!
+    var exportSettings = new ExportSettings();
+    if (File.Exists(ExportSettingsFilename))
+    {
+        using var settingsStream = File.OpenRead(ExportSettingsFilename);
+        try
+        {
+            var result = JsonSerializer.Deserialize<ExportSettings>(settingsStream);
+            if (result != null)
+                exportSettings = result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Unable to read export settings:");
+            Console.WriteLine(ex);
+        }
+    }
+    else
+    {
+        try
+        {
+            File.WriteAllText(ExportSettingsFilename, JsonSerializer.Serialize(exportSettings));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Unable to write export settings:");
+            Console.WriteLine(ex);
+            exportSettings = new();
+        }
+    }
+
+    var importSettings = new ImportSettings();
+    if (File.Exists(ImportSettingsFilename))
+    {
+        using var settingsStream = File.OpenRead(ImportSettingsFilename);
+        try
+        {
+            var result = JsonSerializer.Deserialize<ImportSettings>(settingsStream);
+            if (result != null)
+                importSettings = result;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Unable to read import settings:");
+            Console.WriteLine(ex);
+            importSettings = new();
+        }
+    }
+    else
+    {
+        try
+        {
+            File.WriteAllText(ImportSettingsFilename, JsonSerializer.Serialize(importSettings));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Unable to write import settings:");
+            Console.WriteLine(ex);
+        }
+    }
+
     while (basePath == null || !Directory.Exists(basePath))
     {
         if (basePath != null)
@@ -71,7 +137,7 @@ while (true)
                 var files = Directory.GetFiles(basePath, "*.uasset");
                 foreach (var tableName in files)
                 {
-                    var exporter = new TableExporter(Path.Combine(basePath, tableName));
+                    var exporter = new TableExporter(Path.Combine(basePath, tableName), exportSettings);
 
                     var targetPath = Path.GetFileName(Path.ChangeExtension(tableName, "toml"));
                     if (File.Exists(targetPath))
@@ -116,7 +182,7 @@ while (true)
                 foreach (var tableName in files)
                 {
                     var assetFilename = GetAssetFilename(tableName);
-                    var importer = new TableImporter(tableName, Path.Combine(assetFolder, assetFilename));
+                    var importer = new TableImporter(tableName, Path.Combine(assetFolder, assetFilename), importSettings.Language);
                     var outputPath = Path.Combine(outputFolder, assetFilename);
                     Console.WriteLine($"Exporting to {outputPath}");
                     importer.Write(outputPath);
@@ -134,7 +200,7 @@ while (true)
                     break;
                 }
 
-                var exporter = new TableExporter(Path.Combine(basePath, tableName));
+                var exporter = new TableExporter(Path.Combine(basePath, tableName), exportSettings);
                 var targetPath = Path.ChangeExtension(tableName, "toml");
                 if (File.Exists(targetPath))
                 {
@@ -155,7 +221,7 @@ while (true)
                 var assetPath = Console.ReadLine()!.Trim();
                 if (assetPath.Length < 1)
                     assetPath = Path.Combine(basePath, GetAssetFilename(importPath));
-                var importer = new TableImporter(importPath, assetPath);
+                var importer = new TableImporter(importPath, assetPath, importSettings.Language);
                 Console.Write("Enter the output path or folder: ");
                 var output = Console.ReadLine()!.Trim();
                 if (Directory.Exists(output))

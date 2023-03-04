@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WhackTranslationTool
+namespace WTT
 {
     internal class YesNoPrompt
     {

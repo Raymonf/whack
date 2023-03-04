@@ -1,4 +1,4 @@
-﻿namespace WhackTranslationTool.Exceptions;
+﻿namespace WTT.Exceptions;
 
 public class UnhandledTomlError : Exception
 {
