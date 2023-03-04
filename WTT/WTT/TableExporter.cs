@@ -32,7 +32,8 @@ public class TableExporter
     {
         var tomlTable = new TomlTable();
 
-        tomlTable.AddMessage(entry, 0, "JapaneseMessage");
+        if (_settings.ExportJapaneseMessage)
+            tomlTable.AddMessage(entry, 0, "JapaneseMessage");
         if (_settings.ExportEnglishUSAMessage)
             tomlTable.AddMessage(entry, 1, "EnglishMessageUSA");
         if (_settings.ExportEnglishSGMessage)
@@ -53,7 +54,8 @@ public class TableExporter
     {
         var tomlTable = new TomlTable();
 
-        tomlTable.AddMessage(entry, 3, "JapaneseMessage");
+        if (_settings.ExportJapaneseMessage)
+            tomlTable.AddMessage(entry, 3, "JapaneseMessage");
         if (_settings.ExportEnglishUSAMessage)
             tomlTable.AddMessage(entry, 4, "EnglishMessageUSA");
         if (_settings.ExportEnglishSGMessage)

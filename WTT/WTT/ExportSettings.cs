@@ -3,6 +3,11 @@ namespace WTT;
 public class ExportSettings
 {
     /// <summary>
+    /// Export Japanese message.
+    /// </summary>
+    public bool ExportJapaneseMessage { get; set; } = true;
+
+    /// <summary>
     /// Export English (USA) message.
     /// </summary>
     public bool ExportEnglishUSAMessage { get; set; } = true;
