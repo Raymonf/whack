@@ -120,6 +120,7 @@ while (true)
         });
         Console.WriteLine();
     }
+    Console.WriteLine($"Import language: {importSettings.Language}");
     Console.WriteLine("'e' for export, 'i' for import, 'bi' or 'bulk_import', 'be' or 'bulk_export', 'o' to toggle overwrite mode, 'q' to quit");
     Console.WriteLine($"overwrite mode: {(overwrite.Value ? "ON" : "OFF")}");
     Console.WriteLine("reminder: don't screw up");
