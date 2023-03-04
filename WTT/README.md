@@ -30,6 +30,12 @@ If you want to toggle override mode, use the **o** command.
 
 ### Changelog
 
+### 3/4/2023
+
+Hello, it's 2023! I hackily added settings. See `ExportSettings.json` and `ImportSettings.json`.
+
+Valid values for `Language` in `ImportSettings.json` are:  `Japanese`, `EnglishUSA`, `EnglishSG`, `TraditionalChineseTW`, `TraditionalChineseHK`, `SimplifiedChinese`, `Korean`
+
 ### 11/8/2022
 
 WTT now focuses on editing the `EnglishMessageUSA` column in the strings. Feel free to ask me how you can make your game read that column instead of the `JapaneseMessage` column if you don't know how!
